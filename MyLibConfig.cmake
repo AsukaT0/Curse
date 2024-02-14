@@ -1,0 +1,5 @@
+set(CURRENT_DIR /home/asuka/Programs/libs/MyModules)
+set(MY_LIB_INCLUDES ${CURRENT_DIR}/include)
+set(MY_LIB ${CURRENT_DIR}/cmake-build-debug/libMyLibrary.so)
+include_directories(${MY_LIB_INCLUDES})
+target_link_libraries(${PROJECT_NAME} ${MY_LIB} -lboost_filesystem)

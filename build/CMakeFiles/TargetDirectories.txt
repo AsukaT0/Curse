@@ -1,0 +1,3 @@
+/home/asuka/Programs/libs/MyModules/build/CMakeFiles/MyLibrary.dir
+/home/asuka/Programs/libs/MyModules/build/CMakeFiles/edit_cache.dir
+/home/asuka/Programs/libs/MyModules/build/CMakeFiles/rebuild_cache.dir

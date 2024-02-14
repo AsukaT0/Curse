@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,libMyLibrary.so -o libMyLibrary.so CMakeFiles/MyLibrary.dir/src/File.cpp.o  -lboost_filesystem 
