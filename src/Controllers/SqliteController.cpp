@@ -2,19 +2,17 @@
 #include "../../include/Utils/Utils.h"
 
 
-std::vector<std::string> SqliteController::list; // Вектор для хранения результатов запросов
-
+std::vector<std::string> SqliteController::list;
 int SqliteController::callback([[maybe_unused]] void *data, int argc, char **argv, [[maybe_unused]] char **azColName) {
     std::string tetete;
     for(int ii1 = 0; ii1 < argc; ii1++) {
-        tetete += "\"" + UtilClass::replace(argv[ii1] ? argv[ii1] : "NULL", "\n", "") + "\""; // Формирование строки результата запроса
-    }
-    list.push_back(tetete); // Добавление строки в вектор результатов
+        tetete += "\"" + UtilClass::replace(argv[ii1] ? argv[ii1] : "NULL", "\n", "") + "\"";}
+    list.push_back(tetete);
     return 0;}
 
 std::vector<std::string> SqliteController::exec(const std::string& ss) {
     std::vector<std::string> listik;
-    open(fpath); // Открытие базы данных
+    open(fpath);
     if(isOpen) {
         sqlite3_exec(db, ss.c_str(), callback, null, null); // Выполнение SQL-запроса с использованием callback-функции
         for(const auto& ii1 : list) {

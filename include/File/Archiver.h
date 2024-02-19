@@ -1,10 +1,5 @@
-//
-// Created by asuka on 02.02.2024.
-//
-
-#ifndef MIRAAI_ARCHIVER_H
-#define MIRAAI_ARCHIVER_H
-
+#ifndef MYLIBRARY_ARCHIVER_H
+#define MYLIBRARY_ARCHIVER_H
 
 #include <fstream>
 #include <iostream>
@@ -24,4 +19,4 @@ public:
 };
 
 
-#endif //MIRAAI_ARCHIVER_H
+#endif //MYLIBRARY_ARCHIVER_H

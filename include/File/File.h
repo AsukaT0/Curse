@@ -1,7 +1,5 @@
-
-
-#ifndef UNTITLED1_FILE_H
-#define UNTITLED1_FILE_H
+#ifndef MYLIBRARY_FILE_H
+#define MYLIBRARY_FILE_H
 
 #include <vector>
 #include <iostream>

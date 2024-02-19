@@ -1,10 +1,5 @@
-    //
-// Created by asuka on 09.04.2023.
-//
-
-#ifndef UNTITLED_SQLITECONTROLLER_H
-#define UNTITLED_SQLITECONTROLLER_H
-
+#ifndef MYLIBRARY_SQLITECONTROLLER_H
+#define MYLIBRARY_SQLITECONTROLLER_H
 
 #include <vector>
 #include <string>

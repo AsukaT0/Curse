@@ -1,9 +1,5 @@
-//
-// Created by asuka on 12.02.2024.
-//
-
-#ifndef MIRAAI_STOPWATCH_H
-#define MIRAAI_STOPWATCH_H
+#ifndef MYLIBRARY_STOPWATCH_H
+#define MYLIBRARY_STOPWATCH_H
 
 
 #include <string>
@@ -18,4 +14,4 @@ public:
 };
 
 
-#endif //MIRAAI_STOPWATCH_H
+#endif //MYLIBRARY_STOPWATCH_H

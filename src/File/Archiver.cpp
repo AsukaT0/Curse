@@ -1,7 +1,3 @@
-//
-// Created by asuka on 02.02.2024.
-//
-
 #include <filesystem>
 #include "../../include/File/Archiver.h"
 #include "../../include/File/File.h"

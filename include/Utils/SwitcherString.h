@@ -1,5 +1,5 @@
-#ifndef UNTITLED_SWITCHERSTRING_H
-#define UNTITLED_SWITCHERSTRING_H
+#ifndef MYLIBRARY_SWITCHERSTRING_H
+#define MYLIBRARY_SWITCHERSTRING_H
 #include <string>
 #define Switch(str)  switch(s_s::str_hash_for_switch(str))
 #define Case(str)    static_assert(s_s::str_is_correct(str) && (s_s::str_len(str) <= s_s::MAX_LEN),\
@@ -24,4 +24,4 @@ namespace s_s{
     inline ullong str_hash_for_switch(const std::string& str) {
         return str_is_correct(str.c_str()) && str.length() <= MAX_LEN ? str_hash(str.c_str(), str.length()) : N_HASH;}
 }
-#endif //UNTITLED_SWITCHERSTRING_H
+#endif //MYLIBRARY_SWITCHERSTRING_H

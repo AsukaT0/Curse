@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(SOURCES
         src/File/File.cpp
         src/File/Archiver.cpp
-        src/File/ConfigLoader.cpp src/Utils/Utils.cpp src/Utils/Stopwatch.cpp src/Controllers/SqliteController.cpp include/Utils/SwitcherString.h src/Net/Client/SClient.cpp)
+        src/File/ConfigLoader.cpp src/Utils/Utils.cpp src/Utils/Stopwatch.cpp src/Controllers/SqliteController.cpp include/Utils/SwitcherString.h src/Net/Client/SClient.cpp src/Net/Server/SServer6.cpp)
 add_library(MyLibrary SHARED ${SOURCES})
 
 

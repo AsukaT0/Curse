@@ -1,10 +1,5 @@
-//
-// Created by asuka on 17.08.2023.
-//
-
-#ifndef DARLIGHT_SCLIENT_H
-#define DARLIGHT_SCLIENT_H
-
+#ifndef MYLIBRARY_SCLIENT_H
+#define MYLIBRARY_SCLIENT_H
 
 #include <string>
 
@@ -16,4 +11,4 @@ public:
 };
 
 
-#endif //DARLIGHT_SCLIENT_H
+#endif //MYLIBRARY_SCLIENT_H

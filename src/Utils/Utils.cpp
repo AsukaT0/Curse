@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 #include <regex>
+#include <utility>
 #include "../../include/Utils/Utils.h"
 
 std::vector<std::string> UtilClass::split(const std::string &str, const std::string &delimiters) {
@@ -98,3 +99,10 @@ std::vector<File> UtilClass::sortChildsNum(std::vector<File> arr) {
 
         return partNumber1 < partNumber2;});
     return arr;}
+
+std::string UtilClass::multiply_replace(std::string input, const std::vector<std::vector<std::string>> &replaceable) {
+    std::string test = std::move(input);
+    for(auto i:replaceable){
+        test = replace(test,i[0],i[1]);}
+    return std::move(test);
+}
