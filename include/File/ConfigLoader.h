@@ -11,13 +11,15 @@ class ConfigLoader {
 private:
     std::map<std::string,VALUE> fullData;
     std::string data;
-    std::vector<std::string> parseObj(const std::string &_data);
-    void parseValues(const std::string &_data);
+    std::vector<std::string> preParseObj(const std::string &_data);
+    std::vector<std::string> preParseArr(const std::string &_data);
+    std::vector<std::variant<int,bool,std::string,ConfigLoader>> parseArr(const std::string &_data);
+    std::vector<std::string> prePrePreParse;
+    void firstCicParse(const std::string &_data);
 public:
     explicit ConfigLoader(std::string data);
     ConfigLoader()= default;
-
-    [[maybe_unused]] void loadFromPath(std::string path);
+    void loadFromPath(std::string path);
     void saveToPath(std::string path);
     void parseConfig(const std::string & data);
     void parseConfig();
@@ -29,8 +31,11 @@ public:
     [[maybe_unused]] int getInt(const std::string& key);
     [[maybe_unused]] ConfigLoader getSubConfig(const std::string& key);
     [[maybe_unused]] std::vector<std::variant<int,bool,std::string,ConfigLoader>> getArray(const std::string& key);
+
+    [[maybe_unused]] std::string getStringFromArr(const std::string& key,int index);
+    [[maybe_unused]] bool getBooFromArr(const std::string& key,int index);
+    [[maybe_unused]] int getIntFromArr(const std::string& key,int index);
+    [[maybe_unused]] ConfigLoader getSubConfigFromArr(const std::string& key,int index);
+
 };
-
-
-
 #endif
