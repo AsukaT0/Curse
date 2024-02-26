@@ -106,3 +106,10 @@ std::string UtilClass::multiply_replace(std::string input, const std::vector<std
         test = replace(test,i[0],i[1]);}
     return std::move(test);
 }
+
+template<typename T>
+std::vector<T> UtilClass::getKeys(std::map<T, T> map) {
+    std::vector<T> key;
+    for(typename std::map<T,T>::iterator it = map.begin(); it != map.end(); ++it) {
+        key.push_back(it->first);}
+    return key;}

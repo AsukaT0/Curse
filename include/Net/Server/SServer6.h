@@ -13,7 +13,7 @@ class SServer6{
 public:
     [[maybe_unused]] static int INFINITY_SOCKET;
     [[maybe_unused]] static int ONCE_SOCKET;
-    [[maybe_unused]] static void start(int type, int port, const std::function<void(const int server_fd)>& doing);
+        [[maybe_unused]] static void start(int type, int port, const std::function<void(const int server_fd)>& doing);
 };
 
 #endif

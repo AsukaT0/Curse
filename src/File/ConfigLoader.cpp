@@ -67,7 +67,7 @@ void ConfigLoader::parseConfig(const std::string &_data) {
         preData = preParseArr(preData)[0];
         if(preData.find(",]")!=std::string::npos){
             preData = UtilClass::multiply_replace(preData, {{",]", "]"}});}}
-    preData = UtilClass::multiply_replace(preData,{{"[",""},{"]",""}});
+    preData = UtilClass::multiply_replace(preData,{{"[",""},{"]",""},{")\"","),\""}});
     firstCicParse(preData);
 }
 
@@ -91,17 +91,27 @@ bool ConfigLoader::getBool(const std::string& key) {
 int ConfigLoader::getInt(const std::string& key) {
     if (std::holds_alternative<int>(get(key))) {
         return std::get<int>(get(key));}
-    else{std::cout << "Error:value not found: " << key << "\n";return 0;}}
+    else{std::cout << "Error:value not found: " << key << "\n";return -1;}}
+
+float ConfigLoader::getFloat(const std::string &key) {
+    if (std::holds_alternative<float>(get(key))) {
+        return std::get<float>(get(key));}
+    else{std::cout << "Error:value not found: " << key << "\n";return -1;}}
 
 ConfigLoader ConfigLoader::getSubConfig(const std::string& key) {
     if (std::holds_alternative<ConfigLoader>(get(key))) {
         return std::get<ConfigLoader>(get(key));}
     else{std::cout << "Error:value not found: " << key << "\n";return {};}}
 
-std::vector<std::variant<int, bool, std::string, ConfigLoader>> ConfigLoader::getArray(const std::string& key) {
-    if (std::holds_alternative<std::vector<std::variant<int, bool, std::string, ConfigLoader>>>(get(key))) {
-        return std::get<std::vector<std::variant<int, bool, std::string, ConfigLoader>>>(get(key));}
+std::vector<std::variant<int, float, bool, std::string, ConfigLoader>> ConfigLoader::getArray(const std::string& key) {
+    if (std::holds_alternative<std::vector<std::variant<int, float, bool, std::string, ConfigLoader>>>(get(key))) {
+        return std::move(std::get<std::vector<std::variant<int, float , bool, std::string, ConfigLoader>>>(get(key)));}
     else{std::cout << "Error:value not found: " << key << "\n";return {};}}
+
+bool checkOnluNum(std::string test){
+    for(auto k:test){
+        if(k != '0'&&k != '1'&&k != '2'&&k != '3'&&k != '4'&&k != '5'&&k != '6'&&k != '7'&&k != '8'&&k != '9'&&k != '-'&&k != '.')return false;}
+    return true;}
 
 void ConfigLoader::firstCicParse(const std::string &_data) {
     std::string preData = UtilClass::multiply_replace(_data, {{")(", "),("},{"{",""},{"}",""}});
@@ -126,16 +136,17 @@ void ConfigLoader::firstCicParse(const std::string &_data) {
         else if(val.find('[')!=std::string::npos){fullData[key] = parseArr(val);}
         else{
             if(std::all_of(val.begin(), val.end(), [](char c) {return std::isdigit(c);})){fullData[key] = std::stoi(val);}
+            else if(checkOnluNum(val)){fullData[key] = std::stof(val);}
             else if(val == "true"){fullData[key] = true;}
             else if(val == "false"){fullData[key] = false;}
             else{fullData[key] = UtilClass::replace(val,"\"","");}}}}
-
-std::vector<std::variant<int, bool, std::string, ConfigLoader>> ConfigLoader::parseArr(const std::string &_data) {
-    std::vector<std::variant<int, bool, std::string, ConfigLoader>> out;
+std::vector<std::variant<int, float, bool, std::string, ConfigLoader>> ConfigLoader::parseArr(const std::string &_data) {
+    std::vector<std::variant<int,float, bool, std::string, ConfigLoader>> out;
     std::string preData = UtilClass::multiply_replace(_data,{{")(","),("}});
     preData = preData.substr(1,preData.find_last_of(']')-1);
     std::vector<std::string> valArr = UtilClass::split(preData,",");
     for(std::string val:valArr){
+        val = UtilClass::trim(val);
         if(val.find('(')!=std::string::npos){
             while(val.find('(')!=std::string::npos){
                 UL startRep = val.find('(')+1;
@@ -145,36 +156,71 @@ std::vector<std::variant<int, bool, std::string, ConfigLoader>> ConfigLoader::pa
             ConfigLoader subConfig(val);
             subConfig.parseConfig();
             out.emplace_back(subConfig);}
-        else if(std::all_of(val.begin(), val.end(), [](char c) {return std::isdigit(c);})){out.emplace_back(std::stoi(val));}
+        else if(std::all_of(val.begin(), val.end(), [](char c) {return std::isdigit(c)||c=='-';})){out.emplace_back(std::stoi(val));}
+        else if(std::all_of(val.begin(), val.end(), [](char c) {return std::isdigit(c)||c=='.'||c=='-';})){out.emplace_back(std::stof(val));}
         else if(val == "true"){out.emplace_back(true);}
         else if(val == "false"){out.emplace_back(false);}
-        else{out.emplace_back(UtilClass::replace(val,"\"",""));}}
+        else{
+            out.emplace_back(UtilClass::replace(val,"\"",""));}}
     return out;}
 
 std::string ConfigLoader::getStringFromArr(const std::string &key, int index) {
-    std::vector<std::variant<int,bool,std::string,ConfigLoader>> array = getArray(key);
+    std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> array = getArray(key);
     if(array.empty()){return "";}
     if (std::holds_alternative<std::string>(array[index])) {
         return std::get<std::string>(array[index]);}
-    else{std::cout << "Error:value in array not found: " << key << "\n";return "";}}
+    else{std::cout << "Error:value in array not found: " << index << "\n";return "";}}
 
-bool ConfigLoader::getBooFromArr(const std::string &key, int index) {
-    std::vector<std::variant<int,bool,std::string,ConfigLoader>> array = getArray(key);
+bool ConfigLoader::getBoolFromArr(const std::string &key, int index) {
+    std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> array = getArray(key);
     if(array.empty()){return false;}
     if (std::holds_alternative<bool>(array[index])) {
         return std::get<bool>(array[index]);}
-    else{std::cout << "Error:value in array not found: " << key << "\n";return false;}}
+    else{std::cout << "Error:value in array not found: " << index << "\n";return false;}}
 
 int ConfigLoader::getIntFromArr(const std::string &key, int index) {
-    std::vector<std::variant<int,bool,std::string,ConfigLoader>> array = getArray(key);
+    std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> array = getArray(key);
     if(array.empty()){return -1;}
     if (std::holds_alternative<int>(array[index])) {
         return std::get<int>(array[index]);}
-    else{std::cout << "Error:value in array not found: " << key << "\n";return -1;}}
+    else{std::cout << "Error:value in array not found: " << index << "\n";return -1;}}
+
+float ConfigLoader::getFloatFromArr(const std::string &key, int index) {
+    std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> array = getArray(key);
+    if(array.empty()){return -1;}
+    if (std::holds_alternative<float>(getArray(key)[index])) {
+        return std::get<float>(getArray(key)[index]);}
+    else{
+        std::cout << "Error:value in array not found: " << index << "\n";return -1;}}
 
 ConfigLoader ConfigLoader::getSubConfigFromArr(const std::string &key, int index) {
-    std::vector<std::variant<int,bool,std::string,ConfigLoader>> array = getArray(key);
+    std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> array = getArray(key);
     if(array.empty()){return {};}
     if (std::holds_alternative<ConfigLoader>(array[index])) {
         return std::get<ConfigLoader>(array[index]);}
-    else{std::cout << "Error:value in array not found: " << key << "\n";return {};}}
+    else{std::cout << "Error:value in array not found: " << index << "\n";return {};}}
+
+std::string ConfigLoader::getData() {
+    return data;
+}
+
+ConfigLoader::~ConfigLoader() {
+    fullData.clear();
+    std::map<std::string, VALUE>().swap(fullData);
+    data.clear();
+    data.shrink_to_fit();
+    prePrePreParse.clear();
+    prePrePreParse.shrink_to_fit();
+}
+
+void ConfigLoader::finalize() {
+    fullData.clear();
+    std::map<std::string, VALUE>().swap(fullData);
+    data.clear();
+    data.shrink_to_fit();
+    prePrePreParse.clear();
+    prePrePreParse.shrink_to_fit();
+}
+
+std::map<std::string, VALUE > ConfigLoader::getFullData() {
+    return fullData;}

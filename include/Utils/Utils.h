@@ -2,7 +2,7 @@
 #include <thread>
 #include <pwd.h>
 #include "../File/File.h"
-
+#include <map>
 #ifndef MYLIBRARY_UTILCLASS_H
 
 #define MYLIBRARY_UTILCLASS_H
@@ -22,5 +22,9 @@ public:
     static void getDate(int &day,int &mouth,int &year);
 
     static std::string exec(const std::string& command);
-    static std::string exec(const std::string& command, const File &writeInto);};
+    static std::string exec(const std::string& command, const File &writeInto);
+
+    template<typename T>
+    static std::vector<T> getKeys(std::map<T,T> map);
+};
 #endif //MYLIBRARY_UTILCLASS_H
