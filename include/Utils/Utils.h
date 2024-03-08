@@ -24,7 +24,8 @@ public:
     static std::string exec(const std::string& command);
     static std::string exec(const std::string& command, const File &writeInto);
 
-    template<typename T>
-    static std::vector<T> getKeys(std::map<T,T> map);
+    template<typename T,typename K>
+    static std::vector<T> getKeys(std::map<T,K> map);
+    static std::vector<std::string> matcherText(std::string patern,std::string text);
 };
 #endif //MYLIBRARY_UTILCLASS_H

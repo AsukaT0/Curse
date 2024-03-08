@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include "../../../include/Net/Client/SClient.h"
 
-void SClient::error(const std::string& message) {
+void    SClient::error(const std::string& message) {
     std::cerr << message << std::endl;
 }
 std::string SClient::sendFunc(const std::string& host, int port, std::string message) {

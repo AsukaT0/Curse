@@ -107,9 +107,20 @@ std::string UtilClass::multiply_replace(std::string input, const std::vector<std
     return std::move(test);
 }
 
-template<typename T>
-std::vector<T> UtilClass::getKeys(std::map<T, T> map) {
+std::vector<std::string> UtilClass::matcherText(std::string patern, std::string text) {
+    std::vector<std::string> ret;
+    std::string  test_text = text;
+    std::regex pattern(patern);
+    std::smatch match;
+    while(std::regex_search(test_text, match, pattern)) {
+        std::string result = match.str();
+        test_text = replace(test_text,result,"");
+        ret.push_back(result);}
+    return std::move(ret);}
+
+template<typename T,typename K>
+std::vector<T> UtilClass::getKeys(std::map<T, K> map) {
     std::vector<T> key;
-    for(typename std::map<T,T>::iterator it = map.begin(); it != map.end(); ++it) {
+    for(typename std::map<T,K>::iterator it = map.begin(); it != map.end(); ++it) {
         key.push_back(it->first);}
     return key;}

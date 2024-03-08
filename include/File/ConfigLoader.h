@@ -5,15 +5,16 @@
 #include <map>
 #include <variant>
 #include <vector>
-#define VALUE std::variant<int,float,bool,std::string,ConfigLoader,std::vector<std::variant<int,float,bool,std::string,ConfigLoader>>>
 #define UL unsigned long
 class ConfigLoader {
 private:
-    std::map<std::string,VALUE> fullData;
     std::string data;
+
+    #define VALUE std::variant<int,float,bool,std::string,ConfigLoader,std::vector<std::variant<int,float,bool,std::string,ConfigLoader>>>
+    std::map<std::string,VALUE> fullData;
+        std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> parseArr(const std::string &_data);
     std::vector<std::string> preParseObj(const std::string &_data);
     std::vector<std::string> preParseArr(const std::string &_data);
-    std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> parseArr(const std::string &_data);
     std::vector<std::string> prePrePreParse;
     void firstCicParse(const std::string &_data);
 public:
@@ -42,6 +43,7 @@ public:
     [[maybe_unused]] ConfigLoader getSubConfigFromArr(const std::string& key,int index);
 
     std::string getData();
+
 
     ~ConfigLoader();
     void finalize();
