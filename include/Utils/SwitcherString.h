@@ -11,14 +11,18 @@ namespace s_s{
     typedef unsigned long long ullong;
     constexpr uchar MAX_LEN = 100;
     constexpr ullong N_HASH = static_cast<ullong>(-1);
-    constexpr ullong raise_128_to(const uchar power){
-        return 1ULL << 7 * power;}
+    constexpr ullong raise_128_to(const uchar power) {
+        ullong result = 1ULL;
+        for (uchar i = 0; i < power; i++) {
+            result *= 128ULL;}
+        return result;}
     constexpr bool str_is_correct(const char* const str){
         return static_cast<signed char>(*str) > 0 ? str_is_correct(str + 1) : *str ? false : true;}
-    constexpr uchar str_len(const char* const str){
-        return *str ? 1 + str_len(str + 1) : 0;}
     constexpr ullong str_hash(const char* const str, const uchar current_len){
         return *str ? raise_128_to(current_len - 1) * static_cast<uchar>(*str) + str_hash(str + 1, current_len - 1) : 0;}
+    constexpr uchar str_len(const char* const str){
+        return *str && MAX_LEN > 0 ? 1 + str_len(str + 1) : 0;}
+
     inline ullong str_hash_for_switch(const char* const str){
         return str_is_correct(str) && str_len(str) <= MAX_LEN ? str_hash(str, str_len(str)) : N_HASH;}
     inline ullong str_hash_for_switch(const std::string& str) {

@@ -4,74 +4,56 @@
 
 
 #include <utility>
+#include <string>
 #include <algorithm>
+std::vector<std::string> strings;
+std::vector<std::string> arrays;
+std::vector<std::string> configs;
+bool checkOnluNum(std::string test){
+    for(auto k:test){
+        if(k != '0'&&k != '1'&&k != '2'&&k != '3'&&k != '4'&&k != '5'&&k != '6'&&k != '7'&&k != '8'&&k != '9'&&k != '-'&&k != '.')return false;}
+    return true;}
+bool checkOnluDig(std::string test){
+    for(auto k:test){
+        if(k != '0'&&k != '1'&&k != '2'&&k != '3'&&k != '4'&&k != '5'&&k != '6'&&k != '7'&&k != '8'&&k != '9'&&k != '-')return false;}
+    return true;}
+
+
 
 ConfigLoader::ConfigLoader(std::string data) {this->data = std::move(data);}
 void ConfigLoader::loadFromPath(std::string path) {data = File(std::move(path)).read();}
-void ConfigLoader::saveToPath(std::string path) {File(std::move(path)).write(data);}
-
-std::vector<std::string> ConfigLoader::preParseObj(const std::string &_data){
-    std::string _data_ = _data;
-    std::string subConfigData;
-    if (_data_.substr(1, _data_.length() - 1).find('{') != std::string::npos){
-        std::string insidePreData = _data_.substr(1, _data_.length() - 1);
-        UL startObj = 0;
-        UL endObj = 1;
-        for(UL ii1 = 0;ii1 < insidePreData.length();ii1++){
-            if(insidePreData[ii1] == '{'){
-                startObj = ii1;}
-            if(insidePreData[ii1] == '}'){
-                endObj = ii1;
-                break;}}
-        if(insidePreData.find_first_of(',',endObj+1)<insidePreData.find_first_not_of(',',endObj+1)){
-            endObj = insidePreData.find_first_of(',',endObj+1);}
-
-        std::string insideSubData = insidePreData.substr(startObj,endObj-startObj+1);
-        std::string labelSubData;
-        prePrePreParse.push_back(insideSubData);
-        _data_ = UtilClass::replace_once(_data_, insideSubData, "("+std::to_string((int)prePrePreParse.size()-1)+")");
-        return {_data_};}
-    return {_data_};}
-std::vector<std::string> ConfigLoader::preParseArr(const std::string &_data){
-    std::string _data_ = _data;
-    std::string subConfigData;
-    if (_data_.substr(1, _data_.length() - 1).find('[') != std::string::npos){
-        std::string insidePreData = _data_.substr(1, _data_.length() - 1);
-        UL startObj = 0;
-        UL endObj = 1;
-        for(UL ii1 = 0;ii1 < insidePreData.length();ii1++){
-            if(insidePreData[ii1] == '['){
-                startObj = ii1;}
-            if(insidePreData[ii1] == ']'){
-                endObj = ii1;
-                break;}}
-        if(insidePreData.find_first_of(',',endObj+1)<insidePreData.find_first_not_of(',',endObj+1)){
-            endObj = insidePreData.find_first_of(',',endObj+1);}
-
-        std::string insideSubData = insidePreData.substr(startObj,endObj-startObj);
-        std::string labelSubData;
-        prePrePreParse.push_back(insideSubData);
-        _data_ = UtilClass::replace_once(_data_, insideSubData, "("+std::to_string((int)prePrePreParse.size()-1)+")");
-        return {_data_};}
-    return {_data_};}
-
-
 void ConfigLoader::parseConfig(const std::string &_data) {
-    std::string preData = UtilClass::trim(_data);
-    preData = UtilClass::multiply_replace(preData.substr(0,preData.length()-1),{{"\t",""},{"\n",""}});
-    while (preData.substr(1,preData.length()-2).find('{')!= std::string::npos){
-        preData = preParseObj(preData)[0];
-        if(preData.find(",}")!=std::string::npos){
-            preData = UtilClass::multiply_replace(preData, {{",}", "}"}});}}
-    while (preData.substr(1,preData.length()-2).find('[')!= std::string::npos){
-        preData = preParseArr(preData)[0];
-        if(preData.find(",]")!=std::string::npos){
-            preData = UtilClass::multiply_replace(preData, {{",]", "]"}});}}
-    preData = UtilClass::multiply_replace(preData,{{"[",""},{"]",""},{")\"","),\""}});
-    firstCicParse(preData);
+    std::string preData = restringer(_data);
+    preData = preData.substr(1,preData.length()-2);
+    preData = reconfigur(preData);
+    preData = rearray(preData);
+    preData = unstringer(preData);
+    strings.clear();
+    std::vector<std::string> dataParse = UtilClass::split(preData,",");
+    for(std::string iData:dataParse){
+        auto iDataSplit = UtilClass::split(iData,":");
+        iDataSplit[0] = iDataSplit[0].substr(1,iDataSplit[0].length()-2);
+        auto val = UtilClass::trim(iDataSplit[1]);
+        if(val.find('`')!=std::string::npos){
+            int numba = std::stoi(iDataSplit[1].substr(1,iDataSplit[1].length()-2));
+            std::string dataConf = configs[numba];
+            fullData[iDataSplit[0]] = ConfigLoader(configs[numba], true);
+        }
+        else if(val.find('|')!=std::string::npos){
+            fullData[iDataSplit[0]] = unarray(std::stoi(iDataSplit[1].substr(1,iDataSplit[1].length()-2)));
+        }
+        else if(checkOnluDig(val)){fullData[iDataSplit[0]] = std::stoi(val);}
+        else if(checkOnluNum(val)){fullData[iDataSplit[0]] = std::stof(val);}
+        else if(val == "true"){fullData[iDataSplit[0]] = true;}
+        else if(val == "false"){fullData[iDataSplit[0]] = false;}
+        else{fullData[iDataSplit[0]] = iDataSplit[1].substr(1,iDataSplit[1].length()-2);}
+    }
+    configs.clear();
+    arrays.clear();
 }
 
-void ConfigLoader::parseConfig() {parseConfig(data);}
+void ConfigLoader::parseConfig() {
+    parseConfig(data);}
 
 VALUE ConfigLoader::get(const std::string& key) {
     VALUE _data = fullData[key];
@@ -108,61 +90,7 @@ std::vector<std::variant<int, float, bool, std::string, ConfigLoader>> ConfigLoa
         return std::move(std::get<std::vector<std::variant<int, float , bool, std::string, ConfigLoader>>>(get(key)));}
     else{std::cout << "Error:value not found: " << key << "\n";return {};}}
 
-bool checkOnluNum(std::string test){
-    for(auto k:test){
-        if(k != '0'&&k != '1'&&k != '2'&&k != '3'&&k != '4'&&k != '5'&&k != '6'&&k != '7'&&k != '8'&&k != '9'&&k != '-'&&k != '.')return false;}
-    return true;}
 
-void ConfigLoader::firstCicParse(const std::string &_data) {
-    std::string preData = UtilClass::multiply_replace(_data, {{")(", "),("},{"{",""},{"}",""}});
-    std::vector<std::string> key_val = UtilClass::split(preData,",");
-    for(auto k:key_val){
-        auto key = UtilClass::replace(UtilClass::trim(UtilClass::split(k,":")[0]),"\"","");
-        auto val = UtilClass::trim(UtilClass::split(k,":")[1]);
-        if(val.find('(')!=std::string::npos){
-            UL startRep = val.find('(')+1;
-            UL endRep = val.find(')',startRep);
-            int vecIndex = std::stoi(val.substr(startRep,endRep-startRep));
-            val = UtilClass::replace(val, "("+std::to_string(vecIndex)+")",prePrePreParse[vecIndex]);}
-        if(val.find('{')!=std::string::npos){
-            while(val.find('(')!=std::string::npos){
-                UL startRep = val.find('(')+1;
-                UL endRep = val.find(')',startRep);
-                int vecIndex = std::stoi(val.substr(startRep,endRep-startRep));
-                val = UtilClass::replace(val, "("+std::to_string(vecIndex)+")",prePrePreParse[vecIndex]);}
-            ConfigLoader subConfig(val);
-            subConfig.parseConfig();
-            fullData[key] = subConfig;}
-        else if(val.find('[')!=std::string::npos){fullData[key] = parseArr(val);}
-        else{
-            if(std::all_of(val.begin(), val.end(), [](char c) {return std::isdigit(c);})){fullData[key] = std::stoi(val);}
-            else if(checkOnluNum(val)){fullData[key] = std::stof(val);}
-            else if(val == "true"){fullData[key] = true;}
-            else if(val == "false"){fullData[key] = false;}
-            else{fullData[key] = UtilClass::replace(val,"\"","");}}}}
-std::vector<std::variant<int, float, bool, std::string, ConfigLoader>> ConfigLoader::parseArr(const std::string &_data) {
-    std::vector<std::variant<int,float, bool, std::string, ConfigLoader>> out;
-    std::string preData = UtilClass::multiply_replace(_data,{{")(","),("}});
-    preData = preData.substr(1,preData.find_last_of(']')-1);
-    std::vector<std::string> valArr = UtilClass::split(preData,",");
-    for(std::string val:valArr){
-        val = UtilClass::trim(val);
-        if(val.find('(')!=std::string::npos){
-            while(val.find('(')!=std::string::npos){
-                UL startRep = val.find('(')+1;
-                UL endRep = val.find(')',startRep);
-                int vecIndex = std::stoi(val.substr(startRep,endRep-startRep));
-                val = UtilClass::replace(val, "("+std::to_string(vecIndex)+")",prePrePreParse[vecIndex]);}
-            ConfigLoader subConfig(val);
-            subConfig.parseConfig();
-            out.emplace_back(subConfig);}
-        else if(std::all_of(val.begin(), val.end(), [](char c) {return std::isdigit(c)||c=='-';})){out.emplace_back(std::stoi(val));}
-        else if(std::all_of(val.begin(), val.end(), [](char c) {return std::isdigit(c)||c=='.'||c=='-';})){out.emplace_back(std::stof(val));}
-        else if(val == "true"){out.emplace_back(true);}
-        else if(val == "false"){out.emplace_back(false);}
-        else{
-            out.emplace_back(UtilClass::replace(val,"\"",""));}}
-    return out;}
 
 std::string ConfigLoader::getStringFromArr(const std::string &key, int index) {
     std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> array = getArray(key);
@@ -204,23 +132,107 @@ std::string ConfigLoader::getData() {
     return data;
 }
 
-ConfigLoader::~ConfigLoader() {
-    fullData.clear();
-    std::map<std::string, VALUE>().swap(fullData);
-    data.clear();
-    data.shrink_to_fit();
-    prePrePreParse.clear();
-    prePrePreParse.shrink_to_fit();
-}
-
 void ConfigLoader::finalize() {
     fullData.clear();
     std::map<std::string, VALUE>().swap(fullData);
     data.clear();
     data.shrink_to_fit();
-    prePrePreParse.clear();
-    prePrePreParse.shrink_to_fit();
 }
 
 std::map<std::string, VALUE > ConfigLoader::getFullData() {
     return fullData;}
+
+
+
+
+
+std::string ConfigLoader::restringer(std::string _data) {
+    std::string preData = std::move(_data);
+    preData = UtilClass::trim(preData);
+    preData = UtilClass::multiply_replace(preData,{{"\n",""},{"\t",""},{"\r",""}});
+    reverse(preData.begin(), preData.end());
+    while(preData.find('\"')!=std::string::npos){
+        int first = preData.find_first_of('\"')+1;
+        int last = preData.substr(first).find_first_of('\"');
+        std::string tete = preData.substr(first-1,last+2);
+        preData = UtilClass::replace(preData,tete,"_"+std::to_string(strings.size())+"_");
+        strings.push_back(tete);
+    }
+    reverse(preData.begin(), preData.end());
+    return preData;}
+
+std::string ConfigLoader::reconfigur(std::string _data) {
+    std::string preData = std::move(_data);
+    while(preData.find('{')!=std::string::npos) {
+        int Kount = 0;
+        long long start = preData.find_first_of('{') + 1;
+        long long end = 0;
+        for (int ii1 = preData.find_first_of('{') + 1; ii1 < preData.length(); ii1++) {
+            if (preData[ii1] == '{') { Kount += 1; }
+            if (preData[ii1] == '}') {
+                if (Kount == 0) {
+                    end = ii1;
+                    break;}
+                else { Kount -= 1; }}}
+        if (end != 0) {
+            std::string tete = preData.substr(start - 1, end - start + 2);
+            std::string reptete = preData.substr(start - 1, end - start + 2);
+            tete = unstringer(tete);
+            configs.push_back(tete);
+            preData = UtilClass::replace(preData, reptete, "`" + std::to_string(configs.size() - 1) + "`");}}
+    return preData;}
+
+
+std::string ConfigLoader::unstringer(std::string _data) {
+    std::string tete = _data;
+    while (tete.find('_') != std::string::npos) {
+        int first = tete.find_first_of('_');
+        int last = tete.find_first_of('_', first + 1);
+        std::string hehe = strings[std::stoi(tete.substr(first + 1, last - first - 1))];
+        reverse(hehe.begin(), hehe.end());
+        tete = UtilClass::replace(tete, tete.substr(first, last - first + 1),hehe);}
+    return tete;}
+
+std::string ConfigLoader::rearray(std::string _data) {
+    std::string preData = std::move(_data);
+    while(preData.find('[')!=std::string::npos) {
+        int Kount = 0;
+        long long start = preData.find_first_of('[') + 1;
+        long long end = 0;
+        for (int ii1 = preData.find_first_of('[') + 1; ii1 < preData.length(); ii1++) {
+            if (preData[ii1] == '[') { Kount += 1; }
+            if (preData[ii1] == ']') {
+                if (Kount == 0) {
+                    end = ii1;
+                    break;}
+                else { Kount -= 1; }}}
+        if (end != 0) {
+            std::string tete = preData.substr(start - 1, end - start + 2);
+            std::string reptete = preData.substr(start - 1, end - start + 2);
+            arrays.push_back(tete);
+            preData = UtilClass::replace(preData, reptete, "|" + std::to_string(arrays.size() - 1) + "|");}}
+    return preData;
+}
+
+std::vector<std::variant<int, float, bool, std::string, ConfigLoader>> ConfigLoader::unarray(int i) {
+    std::vector<std::variant<int, float, bool, std::string, ConfigLoader>> returnable;
+    std::vector<std::string> dataParse = UtilClass::split(arrays[i].substr(1,arrays[i].length()-2),",");
+    for(std::string iData:dataParse){
+        auto val = UtilClass::trim(iData);
+        if(val.find('`')!=std::string::npos){
+            ConfigLoader supConfig;
+            supConfig.parseConfig(configs[std::stoi(val)]);
+            returnable.emplace_back(supConfig);}
+        else if(checkOnluDig(val)){returnable.emplace_back(std::stoi(val));}
+        else if(checkOnluNum(val)){returnable.emplace_back(std::stof(val));}
+        else if(val == "true"){returnable.emplace_back(true);}
+        else if(val == "false"){returnable.emplace_back(false);}
+        else{returnable.emplace_back(UtilClass::replace(val,"\"",""));}
+    }
+    return returnable;
+}
+
+ConfigLoader::ConfigLoader(std::string data, bool parsing) {
+    this->data = std::move(data);
+    if(parsing)parseConfig();
+}

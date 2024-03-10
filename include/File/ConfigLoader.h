@@ -1,6 +1,5 @@
 #ifndef MYLIBRARY_CONFIGLOADER_H
 #define MYLIBRARY_CONFIGLOADER_H
-
 #include <string>
 #include <map>
 #include <variant>
@@ -9,16 +8,16 @@
 class ConfigLoader {
 private:
     std::string data;
-
-    #define VALUE std::variant<int,float,bool,std::string,ConfigLoader,std::vector<std::variant<int,float,bool,std::string,ConfigLoader>>>
+    std::string restringer(std::string _data);
+    std::string unstringer(std::string _data);
+    std::string reconfigur(std::string _data);
+    std::string rearray(std::string _data);
+    std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> unarray(int i);
+#define VALUE std::variant<int,float,bool,std::string,ConfigLoader,std::vector<std::variant<int,float,bool,std::string,ConfigLoader>>>
     std::map<std::string,VALUE> fullData;
-        std::vector<std::variant<int,float,bool,std::string,ConfigLoader>> parseArr(const std::string &_data);
-    std::vector<std::string> preParseObj(const std::string &_data);
-    std::vector<std::string> preParseArr(const std::string &_data);
-    std::vector<std::string> prePrePreParse;
-    void firstCicParse(const std::string &_data);
 public:
     explicit ConfigLoader(std::string data);
+    explicit ConfigLoader(std::string data,bool parsing);
     ConfigLoader()= default;
     void loadFromPath(std::string path);
     void saveToPath(std::string path);
@@ -45,7 +44,6 @@ public:
     std::string getData();
 
 
-    ~ConfigLoader();
     void finalize();
 };
 #endif
