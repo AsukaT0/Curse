@@ -21,19 +21,30 @@ bool checkOnluDig(std::string test){
 
 
 ConfigLoader::ConfigLoader(std::string data) {this->data = std::move(data);}
-void ConfigLoader::loadFromPath(std::string path) {data = File(std::move(path)).read();}
+void ConfigLoader::loadFromPath(std::string path) {data = File(std::move(path)).read();data = data.substr(0,data.length()-1);}
 void ConfigLoader::parseConfig(const std::string &_data) {
     std::string preData = restringer(_data);
     preData = preData.substr(1,preData.length()-2);
     preData = reconfigur(preData);
     preData = rearray(preData);
+//    reverse(preData.begin(), preData.end());
+//    std::cout << preData << "\n";
     preData = unstringer(preData);
+
+    //    reverse(preData.begin(), preData.end());
+
     strings.clear();
     std::vector<std::string> dataParse = UtilClass::split(preData,",");
     for(std::string iData:dataParse){
-        auto iDataSplit = UtilClass::split(iData,":");
+        int splitter;
+        splitter = iData.find_first_of('\"');
+        splitter = iData.find_first_of('\"',splitter+1);
+        splitter = iData.find_first_of(':',splitter+1);
+        std::vector<std::string> iDataSplit = {iData.substr(0, splitter),iData.substr(splitter+1)};
         iDataSplit[0] = iDataSplit[0].substr(1,iDataSplit[0].length()-2);
         auto val = UtilClass::trim(iDataSplit[1]);
+//        std::cout << iDataSplit[0] << " : "<< val << "\n";
+
         if(val.find('`')!=std::string::npos){
             int numba = std::stoi(iDataSplit[1].substr(1,iDataSplit[1].length()-2));
             std::string dataConf = configs[numba];
@@ -155,7 +166,9 @@ std::string ConfigLoader::restringer(std::string _data) {
         int first = preData.find_first_of('\"')+1;
         int last = preData.substr(first).find_first_of('\"');
         std::string tete = preData.substr(first-1,last+2);
-        preData = UtilClass::replace(preData,tete,"_"+std::to_string(strings.size())+"_");
+        std::string tuposti = std::to_string(strings.size());
+        reverse(tuposti.begin(), tuposti.end());
+        preData = UtilClass::replace(preData,tete,")"+tuposti+"(");
         strings.push_back(tete);
     }
     reverse(preData.begin(), preData.end());
@@ -185,9 +198,9 @@ std::string ConfigLoader::reconfigur(std::string _data) {
 
 std::string ConfigLoader::unstringer(std::string _data) {
     std::string tete = _data;
-    while (tete.find('_') != std::string::npos) {
-        int first = tete.find_first_of('_');
-        int last = tete.find_first_of('_', first + 1);
+    while (tete.find('(') != std::string::npos) {
+        int first = tete.find_first_of('(');
+        int last = tete.find_first_of(')', first + 1);
         std::string hehe = strings[std::stoi(tete.substr(first + 1, last - first - 1))];
         reverse(hehe.begin(), hehe.end());
         tete = UtilClass::replace(tete, tete.substr(first, last - first + 1),hehe);}
@@ -209,7 +222,7 @@ std::string ConfigLoader::rearray(std::string _data) {
         if (end != 0) {
             std::string tete = preData.substr(start - 1, end - start + 2);
             std::string reptete = preData.substr(start - 1, end - start + 2);
-            arrays.push_back(tete);
+            arrays.push_back(unstringer(tete));
             preData = UtilClass::replace(preData, reptete, "|" + std::to_string(arrays.size() - 1) + "|");}}
     return preData;
 }
