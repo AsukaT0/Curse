@@ -1,12 +1,13 @@
 #include "../../include/Controllers/SqliteController.h"
 #include "../../include/Utils/Utils.h"
+#include "../../include/Utils/StringUtils.h"
 
 
 std::vector<std::string> SqliteController::list;
 int SqliteController::callback([[maybe_unused]] void *data, int argc, char **argv, [[maybe_unused]] char **azColName) {
     std::string tetete;
     for(int ii1 = 0; ii1 < argc; ii1++) {
-        tetete += "\"" + UtilClass::replace(argv[ii1] ? argv[ii1] : "NULL", "\n", "") + "\"";}
+        tetete += "\"" + StringUtils::replace(argv[ii1] ? argv[ii1] : "NULL", "\n", "") + "\"";}
     list.push_back(tetete);
     return 0;}
 

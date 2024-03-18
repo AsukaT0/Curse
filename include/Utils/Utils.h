@@ -9,13 +9,7 @@
 
 class UtilClass{
 public:
-    static std::vector<std::string> split(const std::string& str, const std::string& delimiters = ".");
-    static std::vector<std::string> split(const std::string& str, char delimiters = '.');
-    static std::string replace(std::string input,const std::string& old_string,const std::string& new_string);
-    static std::string multiply_replace(std::string input,const std::vector<std::vector<std::string>>&replaceable);
 
-    [[maybe_unused]] static std::string replace_once(std::string input,const std::string& old_string,const std::string& new_string);
-    static std::string trim(std::string s);
     static std::vector<File> sortChilds(std::vector<File> arr);
     static std::vector<File> sortChildsNum(std::vector<File> arr);
 
@@ -26,6 +20,7 @@ public:
 
     template<typename T,typename K>
     static std::vector<T> getKeys(std::map<T,K> map);
-    static std::vector<std::string> matcherText(std::string patern,std::string text);
+    static std::tm* getCurrentLocalTime();
+
 };
 #endif //MYLIBRARY_UTILCLASS_H

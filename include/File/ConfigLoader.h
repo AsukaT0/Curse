@@ -8,6 +8,11 @@
 class ConfigLoader {
 private:
     std::string data;
+    std::vector<std::string> configs;
+    std::vector<std::string> keys;
+    std::vector<std::string> strings;
+    std::vector<std::string> arrays;
+
     std::string restringer(std::string _data);
     std::string unstringer(std::string _data);
     std::string reconfigur(std::string _data);
@@ -42,8 +47,8 @@ public:
     [[maybe_unused]] ConfigLoader getSubConfigFromArr(const std::string& key,int index);
 
     std::string getData();
-
-
+    std::string getDataForSave(std::string index);
+    void set(std::string key,VALUE value);
     void finalize();
 };
 #endif

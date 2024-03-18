@@ -36,12 +36,19 @@ bool File::createFile() const {
     return false;}
 
 void File::makedir() const {
-//    std::cout << p << "\n";
-    if(p == "/"){
+    std::string testp = p;
+
+    if(!p.starts_with("/")){
+        std::string currPath = File(".tempfdhuoipjglkdsmpfozlngsknldd").getAbsolutePath();
+        currPath = currPath.substr(0,currPath.find_last_of('/'))+'/';
+        File(".tempfdhuoipjglkdsmpfozlngsknldd").remove();
+        testp = currPath+p;
+    }
+    if(testp == "/"){
         return;}
-    const std::string f = p.substr(0,p.find_last_of("/"));
+    const std::string f = testp.substr(0,p.find_last_of("/"));
     File(f.substr(0,f.find_last_of("/")+1)).makedir();
-    boost::filesystem::create_directory(p.c_str());
+    std::filesystem::create_directory(p.c_str());
 }
 
 void File::moveTo(const std::string& pathTo){

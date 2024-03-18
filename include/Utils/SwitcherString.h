@@ -14,7 +14,7 @@ namespace s_s{
     constexpr ullong raise_128_to(const uchar power) {
         ullong result = 1ULL;
         for (uchar i = 0; i < power; i++) {
-            result *= 128ULL;}
+            result *= 8ULL;}
         return result;}
     constexpr bool str_is_correct(const char* const str){
         return static_cast<signed char>(*str) > 0 ? str_is_correct(str + 1) : *str ? false : true;}
